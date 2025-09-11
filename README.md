@@ -1,4 +1,4 @@
-# 🛡️ Xcapit Offline Wallet Infrastructure on Cardano, Powered by Aiken Smart Contracts
+# 🛡️ Xcapit Offline Wallet on Cardano
 
 ## Overview  
 **Xcapit Offline Wallet on Cardano** is an **open-source, SMS-enabled blockchain wallet** designed for users without internet or smartphones.  
@@ -9,41 +9,41 @@ Unlike traditional wallets, this solution runs **fully offline**, bridging the d
 ---
 
 ## ✨ Key Features  
-- **SMS-Based Account Creation & Management** → Programmatic setup of user addresses on Cardano via SMS, with sponsored initialization by NGOs.  
+- **SMS-Based Wallet Creation & Management** → Programmatic setup of user wallets on Cardano via SMS, with sponsored initialization by NGOs.  
 - **Fund Distribution via Smart Contracts (Aiken)** → Automated, transparent, and traceable distribution of funds.  
 - **Sponsored Onboarding** → NGOs can pre-fund and activate wallets for beneficiaries.  
 - **Offline Payments** → Merchants and users confirm transactions using SMS, without apps or internet.  
-- **Partner Portal** → NGOs and partners can onboard beneficiaries, manage accounts, and monitor fund traceability.  
+- **Partner Portal** → NGOs and partners can onboard beneficiaries, manage their **wallets**, and monitor fund traceability.
 - **Open Source & DPG-Oriented** → Built as a **Digital Public Good** on Cardano.  
 
 ---
 
-## 🎟️ Example Use Case: Voucher System  
+## 🎟️ Example Use Case
 
-The **Wallet System** manages community-distributed funds through a combination of **on-chain** (smart contracts on Cardano written in Aiken) and **off-chain** components the **Low-Tech Wallet (LTW) Service** with SMS integration.  
-Each voucher is a UTxO locked with ADA, controlled by a **Validator** that enforces spending conditions defined in the Datum.  
+The **Xcapit Wallet System** manages community-distributed funds through a combination of **on-chain** (smart contracts on Cardano written in Aiken) and **off-chain** components the **Low-Tech Wallet (LTW) Service** with SMS integration.  
+Each script-locked UTxO contains ADA and is controlled by a Validator that enforces spending conditions defined in the Datum.
 
 ### How It Works  
-1. **Fund Aggregation** → Community funds are first pooled into a custodial UTxO managed by the LTW service (no contract logic required).  
+1. **Fund Aggregation** → Community funds are first pooled into a custodial UTxO managed by the LTW service.  
 
-2. **Creation of Community & Individual Wallets** → Funds are bundled into **wallet pools** at the community level and then subdivided into **individual wallets**, each tied to a specific recipient and validity window.  
+2. **Creation of Community & Individual UTxO** → Funds are bundled into **community UTxO pools** and then subdivided into **individual script-locked UTxOs**, each assigned to a specific recipient and validity window.
 
-![Community & Individual Wallets](docs/images/wallet-beneficiary-account-community-individual.png)  
+![Community & Individual UTxO](docs/images/community-individual-utxo.png)  
 
-3. **Wallet Rules**:  
+3. **Escrowed Funds Rules**:  
    - Only the assigned recipient can spend their funds during the validity window.  
    - If unspent upon expiry, the steward can reclaim the funds.  
    - Partial spends are supported by splitting UTxOs into **merchant payment + remaining balance**.  
 
 4. **Transactions** → Facilitated via **OTP-based authentication over SMS**, ensuring accessibility for users without internet or mobile money.  
 
-![Voucher Redemption](docs/images/wallet-beneficiary-account-redemption.png) 
+![Escrowed Funds Redemption](docs/images/escrowed-funds-redemption.png) 
 
 ---
 
 ## 🚀 Roadmap / Milestones  
 1. **Prototype (Month 2)**  
-   - Core SMS wallet (account setup, transfers, sponsored onboarding).  
+   - Core SMS wallet (wallet setup, transfers, sponsored onboarding).  
    - Transactions verifiable on Cardano testnet.  
 
 2. **MVP (Month 4)**  
@@ -77,11 +77,12 @@ Each voucher is a UTxO locked with ADA, controlled by a **Validator** that enfor
 
 ---
 
-### 1. Creation of Community Vouchers  
+### 1. Converting Community UTxO to Escrowed Funds
+
 **Context**: NGO allocates funds to a community.  
 - ADA is locked into a community UTxO managed by the LTW service (fund custodian).
 - This UTxO requires only the LTW service control key (no smart contract). 
-- LTW Service subdivides the UTxO into individual voucher UTxOs, each locked with a Validator script.
+- LTW Service subdivides the UTxO into individual script-locked UTxOs, each governed by a Validator script.
 
 #### 1.1 Late Claim (via LTW Service)  
 **Context**: Funds not consumed before expiry.  
@@ -90,9 +91,9 @@ Each voucher is a UTxO locked with ADA, controlled by a **Validator** that enfor
 
 ---
 
-### 2. Creation of Individual Wallets  
-**Context**: Recipient receives a dedicated wallet/ account.  
-- Each wallet/ account = UTxO with a spend-type Validator.  
+### 2. Creation of Individual UTxO  
+**Context**: Recipient receives a dedicated UTxO.  
+- UTxO with a spend-type Validator.  
 
 **Datum fields**:  
 - Recipient (authorized spender address)  
@@ -106,22 +107,22 @@ Each voucher is a UTxO locked with ADA, controlled by a **Validator** that enfor
 
 ---
 
-### 3. Wallet Funds Redemption by Recipient  
+### 3. Escrowed Funds Redemption by Recipient  
 **Context**: Recipient spends ADA at a merchant.  
 - Merchant initiates payment request (e.g., 30 ADA).  
 - Backend generates OTP and sends via SMS to recipient.  
 - Recipient shares OTP with merchant → merchant enters OTP in portal.  
 - Backend validates OTP and signs transaction via wallet.  
 - Validator enforces spending rules, executing:  
-  - Voucher UTxO consumed.  
+  - Script-locked UTxO consumed.  
   - New UTxO → Merchant (purchase value).  
-  - New UTxO → Recipient (remaining balance, if any).  
+  - New Script-locked UTxO → Recipient (remaining balance, if any).  
 
 #### 3.1 Partial Expenditure  
-**Context**: Recipient spends less than total funds in their wallet/ account.
-- Wallet/ account UTxO split into:  
+**Context**: Recipient spends less than total funds in their wallet.
+- Recipient UTxO split into:  
   - Merchant UTxO (spent amount).  
-  - Recipient UTxO (remaining balance).  
+  - Recipient Script-locked UTxO (remaining balance).  
 
 ---
 
